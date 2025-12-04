@@ -26,6 +26,7 @@
 #include "vk_pipeline_pool.hh"
 #include "vk_resource_pool.hh"
 #include "vk_samplers.hh"
+#include "vk_vertex_attribute_object.hh"
 
 namespace blender::gpu {
 class VKBackend;
@@ -99,8 +100,6 @@ struct VKExtensions {
   void log() const;
 };
 
-/* TODO: Split into VKWorkarounds and VKExtensions to remove the negating when an extension isn't
- * supported. */
 struct VKWorkarounds {
   /**
    * Some devices don't support pixel formats that are aligned to 24 and 48 bits.
@@ -109,14 +108,6 @@ struct VKWorkarounds {
    * If set to true we should work around this issue by using a different texture format.
    */
   bool not_aligned_pixel_formats = false;
-
-  struct {
-    /**
-     * Is the workaround enabled for devices that don't support using VK_FORMAT_R8G8B8_* as vertex
-     * buffer.
-     */
-    bool r8g8b8 = false;
-  } vertex_formats;
 
   /** Log enabled workarounds. */
   void log() const;
@@ -233,6 +224,8 @@ class VKDevice : public NonCopyable {
   /** Discard pool for resources that could still be used during rendering. */
   VKDiscardPool orphaned_data_render;
   VKPipelinePool pipelines;
+  VKVertexInputDescriptionPool vertex_input_descriptions;
+
   /** Buffer to bind to unbound resource locations. */
   VKBuffer dummy_buffer;
 
